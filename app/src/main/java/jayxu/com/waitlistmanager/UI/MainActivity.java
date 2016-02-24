@@ -1,42 +1,39 @@
 package jayxu.com.waitlistmanager.UI;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
 
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+
+import jayxu.com.waitlistmanager.MODEL.UsefulConstants;
 import jayxu.com.waitlistmanager.R;
 
 
-public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener {
-    private GoogleApiClient mGoogleApiClient;
+public class MainActivity extends ActionBarActivity  {
     private static final int REQUEST_CODE_CAPTURE_IMAGE = 1;
     private static final int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
     private static final String TAG = MainActivity.class.getSimpleName();
+    private ParseUser CurrentParseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        mGoogleApiClient.connect();
+
         setContentView(R.layout.main_activity);
         if (savedInstanceState == null) {
 
@@ -44,32 +41,19 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                     .add(R.id.main_activity, new NewWaitlistFragment())
                     .commit();
         }
+        CurrentParseUser=ParseUser.getCurrentUser();
+
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        if (mGoogleApiClient == null) {
-            // Create the API client and bind it to an instance variable.
-            // We use this instance as the callback for connection and connection
-            // failures.
-            // Since no account name is passed, the user is prompted to choose.
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        // Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();
+
     }
 
     @Override
     protected void onPause() {
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }
+
         super.onPause();
     }
 
@@ -91,6 +75,18 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if (id == R.id.action_add){
+            AlertDialog add_dialog=onCreateDialog();
+            add_dialog.show();
+        }
+        else if(id == R.id.action_logoff){
+            ParseUser.logOut();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -117,46 +113,83 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                 break;
         }
     }
+    public AlertDialog onCreateDialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        final View dialogView=inflater.inflate(R.layout.dialog_signin, null);
+        builder.setView(dialogView)
+                // Add action buttons
+                .setTitle(R.string.add_new_party_title)
+                .setPositiveButton(R.string.Add, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        TextView guestName=(TextView)dialogView.findViewById(R.id.new_guest_name);
+                        TextView partySize=(TextView)dialogView.findViewById(R.id.new_party_number);
+                        TextView guestPhone=(TextView)dialogView.findViewById(R.id.new_phone_number);
+                        String guest_name=guestName.getText().toString();
+                        String party_Size=partySize.getText().toString();
+                        String guest_Phone=guestPhone.getText().toString();
+                        ParseObject obj=new ParseObject(UsefulConstants.Parse_String_Parties);
+                        obj.put(UsefulConstants.Parse_String_GuestName,guest_name);
+                        obj.put(UsefulConstants.Parse_String_PartySize,party_Size);
+                        if(guest_Phone!="") {
+                            obj.put(UsefulConstants.Parse_String_GuestPhone, guest_Phone);
+                        }
+                        obj.put(UsefulConstants.Parse_String_Restaurant, ParseUser.getCurrentUser());
+                        obj.saveInBackground();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Called whenever the API client fails to connect.
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;
-        }
-        // The failure has a resolution. Resolve it.
-        // Called typically when the app is not yet authorized, and an
-        // authorization
-        // dialog is displayed to the user.
-        try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-        } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
-        }
+                    }
+                });
+        return builder.create();
     }
 
 
-
-
-
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "API client connected.");
-//        if (mBitmapToSave == null) {
-//            // This activity has no UI of its own. Just start the camera.
-//            startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
-//                    REQUEST_CODE_CAPTURE_IMAGE);
+//    @Override
+//    public void onConnectionFailed(ConnectionResult result) {
+//        // Called whenever the API client fails to connect.
+//        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+//        if (!result.hasResolution()) {
+//            // show the localized error dialog.
+//            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
 //            return;
 //        }
-//        saveFileToDrive();
-    }
+//        // The failure has a resolution. Resolve it.
+//        // Called typically when the app is not yet authorized, and an
+//        // authorization
+//        // dialog is displayed to the user.
+//        try {
+//            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+//        } catch (IntentSender.SendIntentException e) {
+//            Log.e(TAG, "Exception while starting resolution activity", e);
+//        }
+//    }
 
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
-    }
+
+
+
+
+
+//    @Override
+//    public void onConnected(Bundle connectionHint) {
+//        Log.i(TAG, "API client connected.");
+////        if (mBitmapToSave == null) {
+////            // This activity has no UI of its own. Just start the camera.
+////            startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
+////                    REQUEST_CODE_CAPTURE_IMAGE);
+////            return;
+////        }
+////        saveFileToDrive();
+//    }
+//
+//    @Override
+//    public void onConnectionSuspended(int cause) {
+//        Log.i(TAG, "GoogleApiClient connection suspended");
+//    }
 }

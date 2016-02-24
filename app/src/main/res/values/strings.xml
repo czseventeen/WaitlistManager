@@ -8,4 +8,16 @@
     <string name="TimeWaited_title">Time Waited</string>
     <string name="InvaUserPass">Username/Password is incorrect!</string>
     <string name="action_sign_up">Sign Up</string>
+    <string name="action_add">Add</string>
+
+    <!--Below is for alert dialog -->
+    <string name="guest_name">Guest Name</string>
+    <string name="party_size">Party Size</string>
+    <string name="guest_phone">Phone Number</string>
+    <string name="guest_email">Guest Name</string>
+    <string name="Add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_new_party_title">Add a new party</string>
+    <string name="action_logout">Log off</string>
+
 </resources>

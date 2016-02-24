@@ -2,5 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".NewListActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="99" app:showAsAction="never" />
+    <item android:id="@+id/action_add" android:title="@string/action_add"
+        android:icon="@drawable/ic_add_white_36dp"
+        android:orderInCategory="100" app:showAsAction="always" />
+    <item android:id="@+id/action_logoff" android:title="@string/action_logout"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>
