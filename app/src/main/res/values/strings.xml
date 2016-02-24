@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WaitlistManager</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="new_wait_list">New Waitlist</string>
+    <string name="NameTitle">Name</string>
+    <string name="NumberOfGuests_title">Number Of Guests</string>
+    <string name="TimeWaited_title">Time Waited</string>
+    <string name="InvaUserPass">Username/Password is incorrect!</string>
+    <string name="action_sign_up">Sign Up</string>
+</resources>
