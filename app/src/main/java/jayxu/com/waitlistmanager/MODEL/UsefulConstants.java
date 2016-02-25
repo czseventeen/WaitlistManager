@@ -10,6 +10,9 @@ public class UsefulConstants {
     public static final String Parse_String_GuestEmail="GuestEmail";
     public static final String Parse_String_GuestName="GuestName";
     public static final String Parse_String_Restaurant="Restaurant";
+    public static final String Parse_String_updatedAt="updatedAt";
+    public static final String Parse_String_createdAt="createdAt";
+
 
 
 }

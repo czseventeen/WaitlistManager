@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,7 +18,11 @@ import android.widget.TextView;
 
 
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import jayxu.com.waitlistmanager.MODEL.UsefulConstants;
 import jayxu.com.waitlistmanager.R;
@@ -35,12 +40,20 @@ public class MainActivity extends ActionBarActivity  {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
-        if (savedInstanceState == null) {
-
+//        Calendar myCal= Calendar.getInstance();
+//        Date Today12am=myCal.getTime();
+//        Today12am.setHours(0);
+//        Today12am.setMinutes(0);
+//        Today12am.setSeconds(0);
+//        //check to see if there is any existing
+//        ParseQuery<ParseObject> waitlistQuery= ParseQuery.getQuery(UsefulConstants.Parse_String_Parties);
+//        waitlistQuery.whereEqualTo(UsefulConstants.Parse_String_Restaurant, ParseUser.getCurrentUser());
+//        waitlistQuery.whereGreaterThanOrEqualTo(UsefulConstants.Parse_String_updatedAt,Today12am );
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.main_activity, new NewWaitlistFragment())
+                    .add(R.id.main_activity, new WaitlistFragment())
                     .commit();
-        }
+        ActionBar ab=getSupportActionBar();
+        ab.setTitle(getString(R.string.todaysWaitlist));
         CurrentParseUser=ParseUser.getCurrentUser();
 
     }

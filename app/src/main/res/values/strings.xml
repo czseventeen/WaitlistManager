@@ -19,5 +19,6 @@
     <string name="cancel">Cancel</string>
     <string name="add_new_party_title">Add a new party</string>
     <string name="action_logout">Log off</string>
+    <string name="todaysWaitlist">Today\'s Waitlist</string>
 
 </resources>
